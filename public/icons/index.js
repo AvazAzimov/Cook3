@@ -10,7 +10,7 @@ export const LogOut = "/icons/logout.svg";
 export const MainNavbarIcons = [
 	{
 		img: Home,
-		path: "/home/",
+		path: "/home",
 	},
 	{
 		img: Discount,

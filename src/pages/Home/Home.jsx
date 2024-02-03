@@ -33,8 +33,10 @@ export const Home = () => {
 										className={
 											("transition-colors", ({ isActive }) => (isActive ? "home-link-active" : ""))
 										}
-										to={"/home" + item.path}>
+										to={"/home" + item.path}
+										end>
 										{item.name}
+
 										<span className="inline-block rounded-sm h-1 w-3/5"></span>
 									</NavLink>
 								</li>
@@ -140,7 +142,7 @@ export const Home = () => {
 			</div>
 			<div
 				id="drawer-right-example"
-				className="fixed top-0 right-0 z-40 h-screen overflow-y-auto transition-transform translate-x-full bg-[#1F1D2B] w-3/12 p-6 pt-16"
+				className="fixed top-0 right-0 z-40 h-screen overflow-y-auto transition-transform translate-x-full bg-[#1F1D2B] w-3/12 p-6 pt-16F"
 				tabIndex={-1}
 				aria-labelledby="drawer-right-label">
 				<div className="pb-6 mb-6 border-b border-[#393C49]">
