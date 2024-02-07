@@ -2,15 +2,16 @@ import { useContext, useEffect, useState } from "react";
 import { Temporary_Dishes } from "../../../constants";
 import axios from "axios";
 import { CategoryId } from "../../../context/CategoryId/CategoryId";
+import { OrderDishes } from "../../../context/CategoryId/OrderedDishes";
 
 export const HotDishes = () => {
 	const [dishes, setDishes] = useState([]);
 	const { id } = useContext(CategoryId);
+	const { orderedDishes, setOrderedDishes } = useContext(OrderDishes);
 
 	useEffect(() => {
 		axios(`http://localhost:5000/food/${id}`).then((res) => {
 			setDishes(res.data);
-			console.log(res);
 		});
 	}, []);
 
@@ -28,7 +29,10 @@ export const HotDishes = () => {
 						return (
 							<li
 								key={id}
-								className="bg-[#1F1D2B] flex flex-col relative items-center px-[30px] pt-[114px] pb-6 rounded-lg">
+								className="bg-[#1F1D2B] flex flex-col relative items-center px-[30px] pt-[114px] pb-6 rounded-lg"
+								onClick={() => {
+									setOrderedDishes((prev) => (!prev.includes(id) ? [...prev, id] : prev));
+								}}>
 								<img
 									className="absolute -top-[34px] rounded-full"
 									src={`http://localhost:5000/${image}`}

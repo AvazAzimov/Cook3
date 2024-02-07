@@ -5,13 +5,41 @@ import "flowbite/dist/flowbite.min.js";
 import Card from "../../../public/icons/Card";
 import Paypal from "../../../public/icons/Paypal";
 import Cash from "../../../public/icons/Cash";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CategoryId } from "../../context/CategoryId/CategoryId";
+import { OrderDishes } from "../../context/CategoryId/OrderedDishes";
+import axios from "axios";
+import { render } from "react-dom";
 
 export const Home = () => {
 	const { id, setId } = useContext(CategoryId);
+	const { orderedDishes, setOrderedDishes } = useContext(OrderDishes);
 
-	console.log(id);
+	const [renderingDishes, setRenderingDishes] = useState([]);
+
+	useEffect(() => {
+		axios(`http://localhost:5000/food/${id}`).then((res) => {
+			const arr = [];
+
+			res.data.forEach((item) => {
+				orderedDishes.forEach((id) => {
+					if (id === item.id) {
+						item.count = 1;
+						item.desc = "";
+						renderingDishes.forEach((prevItem) => {
+							if (prevItem.id === id) {
+								item.count && (item.count = prevItem.count);
+								item.desc && (item.desc = prevItem.desc);
+							}
+						});
+
+						arr.push(item);
+					}
+				});
+			});
+			setRenderingDishes(arr);
+		});
+	}, [orderedDishes]);
 
 	return (
 		<>
@@ -96,44 +124,85 @@ export const Home = () => {
 					<strong className="grow-1">Price</strong>
 				</div>
 				<ul className="pt-7 mb-7 flex flex-col gap-y-7 max-h-[51%] overflow-y-scroll">
-					{Temporary_Dine_In.map(({ img, title, price, count, id }) => (
-						<li key={id}>
-							<div className="grid grid-cols-5 mb-2.5 gap-x-4">
-								<div className="flex items-start col-span-3">
-									<img className="me-2 shrink-0" src={img} width={40} height={40} alt="" />
-									<div>
-										<h4 className="mb-1 text-sm leading-[130%] font-medium whitespace-nowrap truncate w-36">
-											{title}
-										</h4>
-										<span className="text-xs leading-[140%] ">{price}</span>
+					{renderingDishes.map((item) => {
+						return (
+							<li key={item.id}>
+								<div className="grid grid-cols-5 mb-2.5 gap-x-4">
+									<div className="flex items-start col-span-3">
+										<img
+											className="me-2 shrink-0"
+											src={`http://localhost:5000/${item.image}`}
+											width={40}
+											height={40}
+											alt=""
+										/>
+										<div>
+											<h4 className="mb-1 text-sm leading-[130%] font-medium whitespace-nowrap truncate w-36">
+												{item.name}
+											</h4>
+											<span className="text-xs leading-[140%] ">{item.price}</span>
+										</div>
 									</div>
+									<button
+										className="bg-[#2D303E] p-3.5 pb-3 rounded-lg font-medium"
+										type="button"
+										onClick={() => {
+											setRenderingDishes((prev) => {
+												return prev.map((prevItem) => {
+													if (prevItem.id === item.id) {
+														item.count += 1;
+													}
+													return prevItem;
+												});
+											});
+										}}>
+										{item.count}
+									</button>
+									<strong className="self-center">$ {item.count * item.price}</strong>
 								</div>
-								<button className="bg-[#2D303E] p-3.5 pb-3 rounded-lg font-medium" type="button">
-									{count}
-								</button>
-								<strong className="self-center">$ 4,58</strong>
-							</div>
-							<div className="grid grid-cols-5 gap-x-4">
-								<input
-									className="bg-[#2D303E] outline-none p-3.5 rounded-lg grow col-span-4"
-									placeholder="Order Note..."
-									type="text"
-								/>
-								<button
-									className="flex items-center justify-center border rounded-lg border-[#EA7C69]"
-									type="button">
-									<Delete className="text-[#EA7C69] text-xl" />
-								</button>
-							</div>
-						</li>
-					))}
+								<div className="grid grid-cols-5 gap-x-4">
+									<input
+										className="bg-[#2D303E] outline-none p-3.5 rounded-lg grow col-span-4"
+										placeholder="Order Note..."
+										type="text"
+										onChange={(evt) => {
+											setRenderingDishes((prev) => {
+												return prev.map((prevItem) => {
+													if (prevItem.id === item.id) {
+														item.desc = evt.target.value.trim();
+													}
+													return prevItem;
+												});
+											});
+										}}
+									/>
+									<button
+										className="flex items-center justify-center border rounded-lg border-[#EA7C69]"
+										type="button"
+										onClick={() => {
+											setRenderingDishes((prev) => {
+												return prev.filter((prevItem) => prevItem.id !== item.id);
+											});
+
+											setOrderedDishes((prev) => prev.filter((orderItem) => orderItem !== item.id));
+										}}>
+										<Delete className="text-[#EA7C69] text-xl" />
+									</button>
+								</div>
+							</li>
+						);
+					})}
 				</ul>
 				<div className="mb-6">
 					<p className="flex justify-between mb-4">
 						Discount <strong>$0</strong>
 					</p>
 					<p className="flex justify-between">
-						Sub total <strong> $ 21,03</strong>
+						Sub total{" "}
+						<strong>
+							{" "}
+							$ {renderingDishes.reduce((acc, item) => acc + item.count * item.price, 0)}
+						</strong>
 					</p>
 				</div>
 				<button
