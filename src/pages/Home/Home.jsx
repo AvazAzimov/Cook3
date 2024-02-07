@@ -5,8 +5,14 @@ import "flowbite/dist/flowbite.min.js";
 import Card from "../../../public/icons/Card";
 import Paypal from "../../../public/icons/Paypal";
 import Cash from "../../../public/icons/Cash";
+import { useContext } from "react";
+import { CategoryId } from "../../context/CategoryId/CategoryId";
 
 export const Home = () => {
+	const { id, setId } = useContext(CategoryId);
+
+	console.log(id);
+
 	return (
 		<>
 			<div className="col-start-2 col-span-8 pt-[13px] ms-1 pe-11 leading-[140%]">
@@ -28,7 +34,7 @@ export const Home = () => {
 					<ul className="flex gap-x-8 text-sm font-semibold">
 						{Home_Nav.map((item) => {
 							return (
-								<li key={item.id}>
+								<li key={item.id} onClick={() => setId(item.id)}>
 									<NavLink
 										className={
 											("transition-colors", ({ isActive }) => (isActive ? "home-link-active" : ""))
